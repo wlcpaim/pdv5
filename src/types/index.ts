@@ -17,16 +17,24 @@ export interface CartItem {
   discount: number;
 }
 
+export interface SaleItem {
+  productId: string;
+  name: string;
+  quantity: number;
+  price: number;
+}
+
 export interface Sale {
   id: string;
   date: string;
-  items: { productId: string; name: string; quantity: number; price: number }[];
+  items: SaleItem[];
   subtotal: number;
   discount: number;
   total: number;
-  paymentMethod: string;
+  paymentMethod: 'CASH' | 'PIX' | 'DEBIT' | 'CREDIT' | 'STORE_CREDIT';
   clientName: string;
   operator: string;
+  status: 'COMPLETED' | 'CANCELLED';
 }
 
 export interface Client {
@@ -35,6 +43,17 @@ export interface Client {
   phone: string;
   email: string;
   totalSpent: number;
+  lastPurchase: string;
+  status: 'VIP' | 'Regular' | 'Inativo';
+}
+
+export interface Supplier {
+  id: string;
+  name: string;
+  category: string;
+  contact: string;
+  phone: string;
+  email: string;
 }
 
 export interface FinancialRecord {
@@ -44,4 +63,26 @@ export interface FinancialRecord {
   description: string;
   amount: number;
   date: string;
+  status: 'PAID' | 'PENDING';
+}
+
+export interface CashSession {
+  isOpen: boolean;
+  openedAt: string;
+  operator: string;
+  initialBalance: number;
+  cashSales: number;
+  pixSales: number;
+  cardSales: number;
+  withdrawals: number;
+  supplies: number;
+  expectedBalance: number;
+}
+
+export interface AuditLog {
+  id: string;
+  timestamp: string;
+  user: string;
+  action: string;
+  details: string;
 }
