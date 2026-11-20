@@ -84,6 +84,14 @@ export function PDV() {
       const prod = updatedProducts.find(p => p.id === item.product.id);
       if (prod) {
         prod.stock -= item.quantity;
+        // Registrar movimentação de estoque
+        db.addStockMovement({
+          productId: prod.id,
+          quantity: item.quantity,
+          type: 'SALE',
+          reason: `Venda ${'SALE-' + Math.floor(1000 + Math.random() * 9000)}`, // Provisional ID for reason
+          user: 'Ana Gerente'
+        });
       }
     });
     db.saveProducts(updatedProducts);
