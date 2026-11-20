@@ -101,7 +101,13 @@ export function PDV() {
     const newSale: Sale = {
       id: 'SALE-' + Math.floor(1000 + Math.random() * 9000),
       date: new Date().toISOString().replace('T', ' ').substring(0, 16),
-      items: cart.map(i => ({ productId: i.product.id, name: i.product.name, quantity: i.quantity, price: i.product.salePrice })),
+      items: cart.map(i => ({ 
+        productId: i.product.id, 
+        name: i.product.name, 
+        quantity: i.quantity, 
+        price: i.product.salePrice,
+        costPrice: i.product.costPrice
+      })),
       subtotal,
       discount: discountAmount,
       total,
@@ -113,6 +119,32 @@ export function PDV() {
 
     const sales = db.getSales();
     db.saveSales([newSale, ...sales]);
+
+    // Atualizar sessão de caixa se for dinheiro ou PIX/Cartão (conforme política)
+    const session = db.getCashSession();
+    if (session.isOpen) {
+      if (paymentMethod === 'CASH') session.cashSales += total;
+      if (paymentMethod === 'PIX') session.pixSales += total;
+      if (['DEBIT', 'CREDIT'].includes(paymentMethod)) session.cardSales += total;
+      session.expectedBalance += (paymentMethod === 'CASH' ? total : 0);
+      db.saveCashSession(session);
+    }
+
+    // Registrar financeiro (Receita)
+    const financial = db.getFinancial();
+    db.saveFinancial([
+      {
+        id: 'f_' + Math.random().toString(36).substr(2, 9),
+        type: 'INCOME',
+        category: 'Vendas PDV',
+        description: `Venda ${newSale.id}`,
+        amount: total,
+        date: new Date().toISOString().split('T')[0],
+        status: 'PAID',
+        paymentMethod
+      },
+      ...financial
+    ]);
 
     // Registrar auditoria
     db.logAction('Ana Gerente', 'VENDA_PDV', `Venda ${newSale.id} realizada no valor de R$ ${total.toFixed(2)} via ${paymentMethod}`);
