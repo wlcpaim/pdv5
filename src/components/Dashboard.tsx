@@ -6,51 +6,8 @@ import {
 } from 'lucide-react';
 
 export function Dashboard() {
-  const [sales] = useState(() => db.getSales());
-  const [products] = useState(() => db.getProducts());
-  const [clients] = useState(() => db.getClients());
-  const [financial] = useState(() => db.getFinancial());
+  const [metrics] = useState(() => calculateFinancialMetrics(db.getSales(), db.getProducts(), db.getFinancial()));
   const [cash] = useState(() => db.getCashSession());
-
-  // Cálculos executivos reais
-  const todaySalesTotal = sales
-    .filter(s => s.date.startsWith('2026-11-20') && s.status === 'COMPLETED')
-    .reduce((acc, s) => acc + s.total, 0);
-
-  const totalRevenue = sales
-    .filter(s => s.status === 'COMPLETED')
-    .reduce((acc, s) => acc + s.total, 0);
-
-  // Custo das mercadorias vendidas (CMV) aproximado (70% do custo cadastrado dos produtos vendidos)
-  let totalCost = 0;
-  sales.filter(s => s.status === 'COMPLETED').forEach(sale => {
-    sale.items.forEach(item => {
-      const prod = products.find(p => p.id === item.productId);
-      if (prod) {
-        totalCost += prod.costPrice * item.quantity;
-      }
-    });
-  });
-
-  const grossProfit = totalRevenue - totalCost;
-  const grossMargin = totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0;
-
-  // Despesas pagas
-  const totalExpenses = financial
-    .filter(f => f.type === 'EXPENSE' && f.status === 'PAID')
-    .reduce((acc, f) => acc + f.amount, 0);
-
-  const netProfitEstimated = grossProfit - totalExpenses;
-  const netMargin = totalRevenue > 0 ? (netProfitEstimated / totalRevenue) * 100 : 0;
-
-  // ROI: (Retorno - Investimento) / Investimento * 100
-  const totalInvestment = totalCost + totalExpenses;
-  const roi = totalInvestment > 0 ? ((totalRevenue - totalInvestment) / totalInvestment) * 100 : 0;
-
-  const ticketMedio = sales.length > 0 ? totalRevenue / sales.filter(s => s.status === 'COMPLETED').length : 0;
-  
-  const lowStockCount = products.filter(p => p.stock <= p.minStock).length;
-  const totalInventoryValue = products.reduce((acc, p) => acc + (p.costPrice * p.stock), 0);
 
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
