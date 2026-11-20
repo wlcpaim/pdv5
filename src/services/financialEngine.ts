@@ -26,12 +26,11 @@ export function calculateFinancialMetrics(
   let totalCost = 0;
   completedSales.forEach(sale => {
     sale.items.forEach(item => {
-      const prod = products.find(p => p.id === item.productId);
-      if (prod) {
-        totalCost += prod.costPrice * item.quantity;
-      }
+      const itemCost = item.costPrice ?? products.find(p => p.id === item.productId)?.costPrice ?? 0;
+      totalCost += itemCost * item.quantity;
     });
   });
+
 
   const grossProfit = totalRevenue - totalCost;
   const grossMargin = totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0;
