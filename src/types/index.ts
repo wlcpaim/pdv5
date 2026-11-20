@@ -54,11 +54,14 @@ export interface Supplier {
   contact: string;
   phone: string;
   email: string;
+  document?: string;
+  address?: string;
 }
 
 export interface StockMovement {
   id: string;
   productId: string;
+  productName?: string;
   quantity: number;
   type: 'IN' | 'OUT' | 'ADJUSTMENT' | 'SALE' | 'RETURN';
   reason: string;
@@ -74,11 +77,14 @@ export interface FinancialRecord {
   amount: number;
   date: string;
   status: 'PAID' | 'PENDING';
+  paymentMethod?: string;
 }
 
 export interface CashSession {
+  id: string;
   isOpen: boolean;
   openedAt: string;
+  closedAt?: string;
   operator: string;
   initialBalance: number;
   cashSales: number;
@@ -87,6 +93,7 @@ export interface CashSession {
   withdrawals: number;
   supplies: number;
   expectedBalance: number;
+  finalBalance?: number;
 }
 
 export interface AuditLog {
