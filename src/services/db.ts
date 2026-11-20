@@ -159,6 +159,23 @@ export const db = {
     localStorage.setItem('wlc_audit', JSON.stringify(logs));
   },
 
+  getStockMovements: (): StockMovement[] => {
+    const data = localStorage.getItem('wlc_stock_movements');
+    return data ? JSON.parse(data) : [];
+  },
+  saveStockMovements: (movements: StockMovement[]) => {
+    localStorage.setItem('wlc_stock_movements', JSON.stringify(movements));
+  },
+  addStockMovement: (m: Omit<StockMovement, 'id' | 'date'>) => {
+    const movements = db.getStockMovements();
+    const newM: StockMovement = {
+      ...m,
+      id: 'stk_' + Math.random().toString(36).substr(2, 9),
+      date: new Date().toISOString().replace('T', ' ').substring(0, 19)
+    };
+    db.saveStockMovements([newM, ...movements]);
+  },
+
   logAction: (user: string, action: string, details: string) => {
     const logs = db.getAuditLogs();
     const newLog: AuditLog = {
