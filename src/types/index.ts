@@ -56,6 +56,16 @@ export interface Supplier {
   email: string;
 }
 
+export interface StockMovement {
+  id: string;
+  productId: string;
+  quantity: number;
+  type: 'IN' | 'OUT' | 'ADJUSTMENT' | 'SALE' | 'RETURN';
+  reason: string;
+  date: string;
+  user: string;
+}
+
 export interface FinancialRecord {
   id: string;
   type: 'INCOME' | 'EXPENSE';
