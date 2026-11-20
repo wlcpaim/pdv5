@@ -22,6 +22,7 @@ export interface SaleItem {
   name: string;
   quantity: number;
   price: number;
+  costPrice: number;
 }
 
 export interface Sale {
